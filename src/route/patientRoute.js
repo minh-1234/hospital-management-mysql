@@ -2,7 +2,7 @@ import express from 'express'
 import { patientController } from '../controller/patientController.js'
 import { patientValidation } from '../validations/patientValidation.js'
 //import { authMiddlewareRole, authMiddlewareLogin } from '../middleware/authMiddleware.js'
-//import treatProcessRouter from './treatProcessRoute.js'
+import treatProcessRouter from './treatProcessRoute.js'
 
 const patientRouter = express.Router();
 
@@ -20,5 +20,5 @@ patientRouter.route('/updateInfo/:id')
   .patch(patientValidation.updatePatientInfo, patientController.update)
 patientRouter.route('/updateInfoMedical/:id')
   .patch(patientValidation.updatePatientInfoMedical, patientController.update)
-//patientRouter.use('/:patientId/treatProcess', treatProcessRouter)
+patientRouter.use('/:patientId/treatProcess', treatProcessRouter)
 export default patientRouter

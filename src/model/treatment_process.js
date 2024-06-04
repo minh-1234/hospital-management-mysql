@@ -1,32 +1,56 @@
 import { Sequelize, Model, DataTypes } from 'sequelize';
 import { sequelize } from '../config/connection.js'
 import { specialistModel } from './specialist.js';
+import { customApiErrorModule } from '../error/customError.js'
 //import { patientModel } from './patient.js'
 const treatment_process = sequelize.define('treatment_process', {
   id: {
-    type: DataTypes.BIGINT.UNSIGNED,
+    type: DataTypes.STRING,
     primaryKey: true
   },
-  dateBegin: DataTypes.STRING,
-  title: DataTypes.STRING,
-  dateEnd: DataTypes.STRING,
-  timeBegin: DataTypes.STRING,
-  timeEnd: DataTypes.STRING,
-  room: DataTypes.STRING,
-  description: DataTypes.TEXT,
+  dateBegin: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  dateEnd: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  timeBegin: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  timeEnd: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  room: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
   patientId: {
-    type: DataTypes.BIGINT.UNSIGNED,
+    type: DataTypes.STRING,
     references: {
       model: 'patients', // 'fathers' refers to table name
       key: 'id', // 'id' refers to column name in fathers table
-    }
+    },
+    allowNull: false
   },
   medicalStaffID: {
-    type: DataTypes.BIGINT.UNSIGNED,
+    type: DataTypes.STRING,
     references: {
       model: 'specialists', // 'fathers' refers to table name
       key: 'id', // 'id' refers to column name in fathers table
-    }
+    },
+    allowNull: false
   }
   // patientId: DataTypes.INTEGER
 }, {
@@ -35,38 +59,103 @@ const treatment_process = sequelize.define('treatment_process', {
   hooks: {
     beforeCreate: async (treatment_process) => {
       const [results] = await sequelize.query('SELECT UUID_SHORT() as uuid');
-      treatment_process.id = results[0].uuid;
+      treatment_process.id = results[0].uuid.toString();
     },
   }
 });
-treatment_process.hasOne(specialistModel.specialist, { foreignKey: 'medicalStaffID' })
+treatment_process.belongsTo(specialistModel.specialist, { foreignKey: 'medicalStaffID' })
 // Đảm bảo rằng bảng "patients" đã được tạo trong cơ sở dữ liệu
-//sequelize.sync({ force: true, raw: true });
+sequelize.sync({ force: false, raw: true });
 const getAllTreatProcess = async (idPatient) => {
   try {
-
     // Lấy tất cả các bệnh nhân từ cơ sở dữ liệu
-    const allProcess = await treatment_process.findAll({ where: { patientId: idPatient } },
-      {
-        include: [
-          {
-            model: specialistModel.specialist,
-            attributes: ['lastMiddleName', 'firstName', 'position']
-          }
-        ]
-      });
+    const allProcess = await treatment_process.findAll({
+      include: [
+        {
+          model: specialistModel.specialist,
+          attributes: ['lastMiddleName', 'firstName', 'position']
+        }
+      ]
+    }, { where: { patientId: idPatient } }
+    );
 
     // Trả về danh sách các bệnh nhân
     return allProcess;
   } catch (error) {
-    // Xử lý lỗi nếu có
-    console.error('Error fetching patients:', error);
-    throw error; // Ném lỗi để xử lý ở phía người gọi hàm
+    const errorMessage = new Error(error).message
+    const customError = new customApiErrorModule.CustomAPIError(422, errorMessage)
+    next(customError)
   }
 };
+const createNew = async (Data, patientId) => {
+  try {
+    // console.log(Data.medicalStaffID)
+    const validData = {
+      ...Data,
+      patientId: patientId
+    }
+    const newTreatProcess = await treatment_process.create(validData)
+    return newTreatProcess
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+}
+const findOneById = async (id, patientId) => {
+  try {
+
+    const targetTreatProcess = await treatment_process.findByPk(id, {
+      include: [{
+        model: specialistModel.specialist,
+        attributes: ['lastMiddleName', 'firstName', 'position']
+      }]
+    },
+      { where: { patientId: patientId } }
+    );
+
+    return targetTreatProcess;
+  } catch (error) {
+    console.error("Error: ", error);
+  }
+}
+const update = async (updateData, id, patientId) => {
+  try {
+    const patientUpdated = await treatment_process.update(updateData, { where: { id: id, patientId: patientId } })
+    return patientUpdated
+  } catch (e) {
+    const errorMessage = new Error(error).message
+    const customError = new customApiErrorModule.CustomAPIError(422, errorMessage)
+    next(customError)
+  }
+}
+const deleteAnItem = async (id, patientId) => {
+  try {
+    const deletePatient = await treatment_process.destroy({ where: { id: id, patientId: patientId } })
+    // const docRef = await updateDoc(scheduleDoc, updateData);
+    return { message: "Deleted item sucessfully !" }
+  } catch (e) {
+    const errorMessage = new Error(error).message
+    const customError = new customApiErrorModule.CustomAPIError(422, errorMessage)
+    next(customError)
+  }
+}
+const deleteManyItems = async (arrayItems, patientId) => {
+  try {
+    arrayItems.forEach(async (_id) => {
+      await treatment_process.destroy({ where: { id: _id } })
+    })
+    // const docRef = await updateDoc(scheduleDoc, updateData);
+    // return docRef
+    return { message: "Deleted many items sucessfully !" }
+  } catch (e) {
+    const errorMessage = new Error(error).message
+    const customError = new customApiErrorModule.CustomAPIError(422, errorMessage)
+    next(customError)
+  }
+}
 export const treatProcessModel = {
   treatment_process,
-  getAllTreatProcess
+  getAllTreatProcess,
+  update, deleteAnItem, deleteManyItems, findOneById, createNew
 }
 
 // db.Course.findAll({

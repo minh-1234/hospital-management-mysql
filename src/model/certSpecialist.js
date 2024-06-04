@@ -3,14 +3,14 @@ import { sequelize } from '../config/connection.js'
 import { treatProcessModel } from './treatment_process.js'
 const cert = sequelize.define('cert', {
   id: {
-    type: DataTypes.BIGINT.UNSIGNED,
+    type: DataTypes.STRING,
     primaryKey: true
   },
   title: DataTypes.STRING,
   date: DataTypes.STRING,
   organization: DataTypes.STRING,
   medicalStaffID: {
-    type: DataTypes.BIGINT.UNSIGNED,
+    type: DataTypes.STRING,
     references: {
       model: 'specialists', // 'fathers' refers to table name
       key: 'id', // 'id' refers to column name in fathers table
@@ -22,7 +22,7 @@ const cert = sequelize.define('cert', {
   hooks: {
     beforeCreate: async (cert) => {
       const [results] = await sequelize.query('SELECT UUID_SHORT() as uuid');
-      cert.id = results[0].uuid;
+      cert.id = results[0].uuid.toString();
     },
   }
 });

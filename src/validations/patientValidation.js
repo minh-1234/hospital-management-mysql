@@ -10,7 +10,6 @@ import {
 
 const createNew = async (req, res, next) => {
   const dataCorrection = Joi.object({
-    id: Joi.string().required(),
     lastMiddleName: Joi.string().required().min(3).max(2000).trim().strict(),
     firstName: Joi.string().required().max(2000).trim().strict(),
     email: Joi.string().email().required().min(3),

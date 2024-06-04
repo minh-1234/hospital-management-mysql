@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize"
-import { env } from "./environment";
+import { env } from "./environment.js";
 // Option 3: Passing parameters separately (other dialects)
 export const sequelize = new Sequelize(env.DATABASE_NAME, env.USER_DB, env.PASSWORD_DB, {
   host: 'localhost',

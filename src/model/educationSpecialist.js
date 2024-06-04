@@ -3,7 +3,7 @@ import { sequelize } from '../config/connection.js'
 import { treatProcessModel } from './treatment_process.js'
 const education = sequelize.define('education', {
   id: {
-    type: DataTypes.BIGINT.UNSIGNED,
+    type: DataTypes.STRING,
     primaryKey: true
   },
   dateBegin: DataTypes.STRING,
@@ -12,7 +12,7 @@ const education = sequelize.define('education', {
   major: DataTypes.STRING,
   degree: DataTypes.STRING,
   medicalStaffID: {
-    type: DataTypes.BIGINT.UNSIGNED,
+    type: DataTypes.STRING,
     references: {
       model: 'specialists', // 'fathers' refers to table name
       key: 'id', // 'id' refers to column name in fathers table
@@ -24,7 +24,7 @@ const education = sequelize.define('education', {
   hooks: {
     beforeCreate: async (education) => {
       const [results] = await sequelize.query('SELECT UUID_SHORT() as uuid');
-      education.id = results[0].uuid;
+      education.id = results[0].uuid.toString();
     },
   }
 });

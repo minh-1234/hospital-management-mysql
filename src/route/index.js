@@ -1,6 +1,6 @@
 import express from 'express'
 import patientRouter from './patientRoute.js'
-//import specialistRouter from './specialistRoute.js';
+import specialistRouter from './specialistRoute.js';
 //import medicineRouter from './medicineRoute.js';
 //import userRouter from './userRoute.js';
 //import equipmentRouter from './equipmentRoute.js';
@@ -13,7 +13,7 @@ Router.route('/')
   })
 //Router.use('/users', userRouter)
 Router.use('/patients', patientRouter)
-//Router.use('/specialists', specialistRouter)
+Router.use('/specialists', specialistRouter)
 // Router.use('/schedules', scheduleRouter)
 //Router.use('/medicines', medicineRouter)
 //Router.use('/equipments', equipmentRouter)

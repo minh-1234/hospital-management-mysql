@@ -15,8 +15,22 @@ const createNew = async (req, res, next) => {
     hometown: Joi.string().required().min(3).max(256).trim().strict(),
     specialty: Joi.string().required().min(3).max(256).trim().strict(),
     position: Joi.string().required().min(3).max(256),
-    cert: Joi.array().default([]),
-    education: Joi.array().default([])
+    cert: Joi.array().items(
+      Joi.object({
+        title: Joi.string().required().min(3).trim().strict(),
+        date: Joi.string().regex(DATE_RULE).required(),
+        organization: Joi.string().required().min(3).trim().strict()
+      })
+    ).default([]),
+    education: Joi.array().items(
+      Joi.object({
+        dateBegin: Joi.string().required().min(3).trim().strict(),
+        dateEnd: Joi.string().required().min(3).trim().strict(),
+        university: Joi.string().required().min(3).trim().strict(),
+        major: Joi.string().required().min(3).trim().strict(),
+        degree: Joi.string().required().min(3).trim().strict()
+      })
+    ).default([])
   })
   try {
     await dataCorrection.validateAsync(req.body, { abortEarly: false })

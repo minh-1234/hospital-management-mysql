@@ -3,6 +3,7 @@ import { sequelize } from '../config/connection.js'
 import { treatProcessModel } from './treatment_process.js'
 import { educationModel } from './educationSpecialist.js'
 import { certModel } from './certSpecialist.js'
+import { scheduleModel } from './schedule.js'
 const specialist = sequelize.define('specialist', {
   id: {
     type: DataTypes.STRING,
@@ -59,6 +60,7 @@ const specialist = sequelize.define('specialist', {
 //associate 
 specialist.hasMany(educationModel.education, { foreignKey: 'medicalStaffID', as: 'education' })
 specialist.hasMany(certModel.cert, { foreignKey: 'medicalStaffID', as: 'cert' })
+specialist.hasMany(scheduleModel.schedule, { foreignKey: 'medicalStaffID', as: 'schedule' })
 // Đảm bảo rằng bảng "patients" đã được tạo trong cơ sở dữ liệu
 sequelize.sync({ force: false }, { raw: true });
 
@@ -95,7 +97,7 @@ const createNew = async (Data) => {
         await educationModel.education.bulkCreate(validDataEducation)
         return results
       })
-    return newSpecialist
+    return newSpecialist.dataValues
   } catch (e) {
     console.error("Error adding document: ", e);
   }

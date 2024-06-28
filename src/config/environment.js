@@ -7,7 +7,9 @@ export const env = {
   PASSWORD_DB: process.env.PASSWORD_DB,
   DATABASE_NAME: process.env.DATABASE_NAME,
   HOST_URL: process.env.HOST_URL,
-  JWT_PRIVATE_KEY: process.env.JWT_PRIVATE_KEY,
+  HOST_URL_AUTH: process.env.HOST_URL_AUTH,
+  JWT_ACCESS_PRIVATE_KEY: process.env.JWT_ACCESS_PRIVATE_KEY,
+  JWT_REFRESH_PRIVATE_KEY: process.env.JWT_REFRESH_PRIVATE_KEY,
   ROLE_ADMIN: process.env.ROLE_ADMIN,
   ROLE_USER: process.env.ROLE_USER,
   SALT: process.env.SALT

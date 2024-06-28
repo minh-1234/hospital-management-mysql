@@ -61,9 +61,6 @@ const getAllPatients = async () => {
       .then(([rows, fields]) => {
         return rows
       })
-    // .then(([rows, fields]) => {
-    //   return rows
-    // })
     return allPatients
   } catch (error) {
     console.error(error)

@@ -2,7 +2,6 @@ import { Sequelize, Model, DataTypes } from 'sequelize';
 import { sequelize } from '../config/connection.js'
 import { specialistModel } from './specialist.js';
 import { customApiErrorModule } from '../error/customError.js'
-//import { patientModel } from './patient.js'
 const treatment_process = sequelize.define('treatment_process', {
   id: {
     type: DataTypes.STRING,
@@ -52,7 +51,6 @@ const treatment_process = sequelize.define('treatment_process', {
     },
     allowNull: false
   }
-  // patientId: DataTypes.INTEGER
 }, {
   tableName: 'treatment_processes',
   timestamps: false, // Bỏ qua các cột `createdAt` và `updatedAt` nếu không cần thiết
@@ -68,7 +66,6 @@ treatment_process.belongsTo(specialistModel.specialist, { foreignKey: 'medicalSt
 sequelize.sync({ force: false, raw: true });
 const getAllTreatProcess = async (idPatient) => {
   try {
-    // Lấy tất cả các bệnh nhân từ cơ sở dữ liệu
     const allProcess = await treatment_process.findAll({
       include: [
         {
@@ -79,7 +76,6 @@ const getAllTreatProcess = async (idPatient) => {
     }, { where: { patientId: idPatient } }
     );
 
-    // Trả về danh sách các bệnh nhân
     return allProcess;
   } catch (error) {
     const errorMessage = new Error(error).message
@@ -89,13 +85,12 @@ const getAllTreatProcess = async (idPatient) => {
 };
 const createNew = async (Data, patientId) => {
   try {
-    // console.log(Data.medicalStaffID)
     const validData = {
       ...Data,
       patientId: patientId
     }
     const newTreatProcess = await treatment_process.create(validData)
-    return newTreatProcess
+    return newTreatProcess.dataValues
   } catch (e) {
     console.error("Error adding document: ", e);
   }
@@ -130,7 +125,6 @@ const update = async (updateData, id, patientId) => {
 const deleteAnItem = async (id, patientId) => {
   try {
     const deletePatient = await treatment_process.destroy({ where: { id: id, patientId: patientId } })
-    // const docRef = await updateDoc(scheduleDoc, updateData);
     return { message: "Deleted item sucessfully !" }
   } catch (e) {
     const errorMessage = new Error(error).message
@@ -143,8 +137,6 @@ const deleteManyItems = async (arrayItems, patientId) => {
     arrayItems.forEach(async (_id) => {
       await treatment_process.destroy({ where: { id: _id } })
     })
-    // const docRef = await updateDoc(scheduleDoc, updateData);
-    // return docRef
     return { message: "Deleted many items sucessfully !" }
   } catch (e) {
     const errorMessage = new Error(error).message

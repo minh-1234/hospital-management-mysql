@@ -122,7 +122,7 @@ const findOneById = async (id) => {
 const createNew = async (Data) => {
   try {
     const newPatient = await patient.create(Data);
-    return newPatient
+    return newPatient.dataValues
   } catch (e) {
     console.error("Error adding document: ", e);
   }
